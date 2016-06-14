@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>게시물 편집</title>
+    <title>
+        {% if post %}
+            게시물 편집
+        {% else %}
+            게시물 작성
+        {% endif %}
+    </title>
 </head>
 <body>
 
     <form method="POST" action="">
         {% csrf_token %}
+
+        <p>
+            <label for="id_category">카테고리</label>
+            <select name="category" id="id_category">
+                {% for category in categories %}
+                    <option value="{{ category.pk }}"
+                            {% if post.category.pk == category.pk %}
+                                selected
+                            {% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </p>
         <p>
             <label for="id_title">글 제목</label>
-            <input type="text" name="title" id="id_title" value=""/>
+            <input type="text" name="title" id="id_title" value="{{ post.title }}"/>
         </p>
 
         <p>
             <textarea name="content">
+                {{ post.content }}
             </textarea>
         </p>
 
@@ -23,6 +42,5 @@
 
         <button type="submit">저장</button>
     </form>
-
 </body>
 </html>

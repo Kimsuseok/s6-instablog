@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}{{ post.title }} - 게시물 삭제{% endblock %}
+
+{% block body %}
+
+    <form method="POST" action="">
+        {% csrf_token %}
+
+        <p>삭제 하시겠습니까?</p>
+        <p>
+            <button type="submit">삭제</button>
+        </p>
+    </form>
+
+{% endblock %}
+

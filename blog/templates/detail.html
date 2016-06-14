@@ -5,6 +5,27 @@
 {% block body %}
     {% include 'part_detail.html' %}
 
+    <h3>댓글</h3>
+    {% for comment in comments %}
+        <div> {{ comment.content }} </div>
+        <form method="POST" action="{% url 'blog:delete_comment' pk=post.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="comment_id" value="{{ comment.pk }}"> <br>
+            <button type="submit">댓글삭제</button>
+        </form>
+    {% endfor %}
+
+    <P><a href="{% url 'blog:edit' pk=post.pk%}">글 수정</a></P>
+    <P><a href="{% url 'blog:delete' pk=post.pk%}">글 삭제</a></P>
     <P><a href="{% url 'blog:list' %}">글 목록</a></P>
+
+    <form method="POST" action="{% url 'blog:comment' pk=post.pk %}">
+        {% csrf_token %}
+        <p>
+            <textarea name="comment"></textarea>
+        </p>
+        <button type="submit">저장</button>
+    </form>
+
 {% endblock %}
 

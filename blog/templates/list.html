@@ -1,10 +1,29 @@
 {% extends 'layout.html' %}
 {% load bootstrap3 %}
 
-{% block page_title %}게시물 등록{% endblock %}
+{% block page_title %}게시물 목록{% endblock %}
 
 {% block body %}
-    <h1>게시물 등록</h1>
+    <h1>게시물 목록</h1>
+
+    <label for="id_category">카테고리 정렬</label>
+    <p>
+        <form method="GET" action="">
+        <select name="category" id="id_category">
+            <option value = "0"
+                    {% if selected_category == 0 %}
+                        selected
+                    {% endif %}>전체</option>
+            {% for category in categories %}
+                <option value="{{ category.pk }}"
+                    {% if selected_category == category.pk %}
+                        selected
+                    {% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">확인</button>
+        </form>
+    </p>
 
     {% for post in posts %}
         <p><a href="{% url 'blog:detail' pk=post.pk %}">{{ post.title }}</a></p>

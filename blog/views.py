@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .models import Post
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Post, Category, Comment
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
 
@@ -7,7 +7,19 @@ from django.core.urlresolvers import reverse
 def list_posts(request):
     per_page = 2
     page = request.GET.get('page', 1)
-    posts = Post.objects.all()
+    category_id = request.GET.get('category', 0)
+
+    try:
+        category_id = int(category_id)
+        if category_id < 0:
+            category_id = 0
+    except ValueError:
+        category_id = 0
+
+    if category_id == 0:
+        posts = Post.objects.all()
+    else:
+        posts = Post.objects.filter(category=category_id)
 
     pg = Paginator(posts, per_page)
     try:
@@ -21,6 +33,8 @@ def list_posts(request):
     ctx = {
         # template에 전달되는 객체는 page 객체이다. page 객체를 이용해 UI 필요한 여러 편리한 기능을 사용할 수 있다.
         'posts' : contents,
+        'categories' : Category.objects.all(),
+        'selected_category' : category_id,
     }
 
     return render(request, 'list.html', ctx)
@@ -30,14 +44,16 @@ def detail_post(request, pk):
 
     ctx = {
         'post' : post,
+        'comments' : Comment.objects.filter(post=post)
     }
 
     return render(request, 'detail.html', ctx)
 
 def create_post(request):
 
+    categories = Category.objects.all()
     ctx = {
-
+        'categories' : categories,
     }
 
     if request.method == 'GET':
@@ -46,10 +62,12 @@ def create_post(request):
     elif request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
+        category = get_object_or_404(Category, pk=request.POST.get('category'))
 
         new_post = Post()
         new_post.title = title
         new_post.content = content
+        new_post.category = category
         new_post.save()
 
         url = reverse('blog:detail', kwargs={'pk':new_post.pk})
@@ -57,6 +75,56 @@ def create_post(request):
 
     return render(request, 'edit.html', ctx)
 
+def edit_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    # GET 일때는 수정을 위한 화면을 보여주고 POST일때는 글 수정을 한다.
+    if request.method == 'GET':
+        categories = Category.objects.all()
+
+    else:
+        post.title = request.POST.get('title')
+        post.content = request.POST.get('content')
+        post.category = get_object_or_404(Category, pk=request.POST.get('category'))
+        post.save()
+        return redirect(reverse('blog:detail', kwargs={'pk' : post.pk}))
+
+    ctx = {
+        'categories' : categories,
+        'post' : post,
+    }
+
+    return render(request, 'edit.html', ctx)
+
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.method == 'POST':
+        post.delete()
+        return redirect('blog:list')
+
+    return render(request, 'delete.html', {'post' : post})
+
+def create_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    comment = request.POST.get('comment')
+
+    if request.method == 'POST':
+        new_comment = Comment()
+        new_comment.post = post
+        new_comment.content = comment
+        new_comment.save()
+
+    return redirect(reverse('blog:detail', kwargs={'pk' : post.pk}))
+
+def delete_comment(request, pk):
+
+    if request.method == 'POST':
+        comment_pk = request.POST.get('comment_id')
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        comment.delete()
+
+    return redirect(reverse('blog:detail', kwargs={'pk': pk}))
 """
 # 페이징을 직접 구현한 경우.
 def list_posts(request):
