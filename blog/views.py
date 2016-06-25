@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, Category, Comment
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -7,9 +9,16 @@ from .models import Post
 from .forms import PostForm
 
 from django.contrib.auth.decorators import login_required
+from instablog.sample_exceptions import HelloWorldError
+
+# getLogger의 이름은 settings.py에 정의한 logger 이름이다.
+logger = logging.getLogger('django')
+
 
 # 페이징을 Paginator를 이용한 경우.
 def list_posts(request):
+    logger.warning('경고~~~~~~~')
+
     per_page = 5
     page = request.GET.get('page', 1)
     category_id = request.GET.get('category', 0)

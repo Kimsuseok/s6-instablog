@@ -1,4 +1,5 @@
 {% load bootstrap3 %}
+{% load static from staticfiles %}
 
 <!DOCTYPE html>
 <!-- Latest compiled and minified CSS -->
@@ -13,6 +14,12 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+<!-- 실제 경로는 statics 폴더 아래에 있지만 settings.py 에 STATIC_URL = '/static/' 로 지정을 해줬기 때문에 static으로 접근함. -->
+<!-- <script type="text/javascript" src="/static/hello.js"></script> -->
+
+<!-- 위와 같이 static 이라는 경로조차 하드코딩하지 않도록 할수있다. 이렇게 하면 settings.py에서 static url을 변경하면 전체 설정을 한번에 바꿀 수 있다. -->
+<script type="text/javascript" src="{% static 'hello.js' %}"></script>
+
 <!--
 Django용 bootstrap3를 설치하면 위의 CDN 입력 없이 아래와 같이 할 수 있다.
 {% bootstrap_css %}
@@ -25,6 +32,7 @@ Django용 bootstrap3를 설치하면 위의 CDN 입력 없이 아래와 같이 �
     <title> {% block page_title %}디폴트 타이틀{% endblock %}</title>
 </head>
 <body class="container">
+    <p>{{ request.just_say }}</p>
 
     {% block body %}
     {% endblock %}

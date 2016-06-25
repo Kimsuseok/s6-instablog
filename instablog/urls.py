@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     url(r'^login/', login, name='login_url', kwargs={'template_name' : 'login.html'}), # template_name을 지정해주지 않으면 기본 화면은 'registration/login.html' 를 사용한다.
@@ -23,3 +25,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^blog/', include('blog.urls', app_name='blog', namespace='blog')),
 ]
+
+# static 파일들을 경로를 위함..
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

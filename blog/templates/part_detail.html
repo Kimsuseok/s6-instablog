@@ -1,3 +1,8 @@
 <h3> {{ post.title }}</h3>
 <div> {{ post.content }} </div>
+
+{% if post.image %}
+    <p><img src="{{ post.image.url }}" /> </p>
+{% endif %}
+
 <p>{{ post.created_at }}</p>
