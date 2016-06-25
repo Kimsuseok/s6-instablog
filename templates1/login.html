@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}로그인{% endblock %}
+
+{% block body %}
+
+{% if form.errors %}
+<p>에러.</p>
+{% endif %}
+
+<form method="POST" action="{% url 'login_url' %}">
+    {% csrf_token %}
+
+    <table>
+        <tr>
+            <td>{{ form.username.label_tag }}</td>
+            <td>{{ form.username }}</td>
+        </tr>
+
+        <tr>
+            <td>{{ form.password.label_tag }}</td>
+            <td>{{ form.password }}</td>
+        </tr>
+    </table>
+
+    <input type="submit" value="login" />
+    <!-- next는 로그인 이후에 이동할 화면이다. 참고로 view에게 받은 next 는 그 이전 화면에 대한 url로 알아서 받는다. -->
+    <input type="hidden" name="next" value="{{ next }}"/>
+</form>
+
+{% endblock %}

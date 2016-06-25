@@ -13,7 +13,9 @@
 
     <form method="POST" action="">
         {% csrf_token %}
+        {{ form.as_p }}
 
+        <!-- form 으로 아래 내용을 대체 함.
         <p>
             <label for="id_category">카테고리</label>
             <select name="category" id="id_category">
@@ -25,6 +27,7 @@
                 {% endfor %}
             </select>
         </p>
+
         <p>
             <label for="id_title">글 제목</label>
             <input type="text" name="title" id="id_title" value="{{ post.title }}"/>
@@ -35,10 +38,7 @@
                 {{ post.content }}
             </textarea>
         </p>
-
-        <p>
-
-        </p>
+        -->
 
         <button type="submit">저장</button>
     </form>

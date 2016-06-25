@@ -3,9 +3,14 @@ from .models import Post, Category, Comment
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
 
+from .models import Post
+from .forms import PostForm
+
+from django.contrib.auth.decorators import login_required
+
 # 페이징을 Paginator를 이용한 경우.
 def list_posts(request):
-    per_page = 2
+    per_page = 5
     page = request.GET.get('page', 1)
     category_id = request.GET.get('category', 0)
 
@@ -49,29 +54,26 @@ def detail_post(request, pk):
 
     return render(request, 'detail.html', ctx)
 
+@login_required
 def create_post(request):
-
+    form = PostForm()
     categories = Category.objects.all()
+
+    if request.method == 'POST':
+        # Form으로 Validataion 체크하는 방법
+        form = PostForm(data=request.POST)
+        if form.is_valid() is True:
+            new_post = form.save(commit=False)  # commit 인자를 False로 주면 save 호출시 DB에 반영하지는 않고 인스턴스 객체만 리턴한다.
+            new_post.user = request.user        # 로그인한 정보를 기입
+            new_post.save()                     # DB에 반영
+
+            url = reverse('blog:detail', kwargs={'pk':new_post.pk})
+            return redirect(url)
+
     ctx = {
+        'form' : form,
         'categories' : categories,
     }
-
-    if request.method == 'GET':
-        return render(request, 'edit.html', ctx)
-
-    elif request.method == 'POST':
-        title = request.POST.get('title')
-        content = request.POST.get('content')
-        category = get_object_or_404(Category, pk=request.POST.get('category'))
-
-        new_post = Post()
-        new_post.title = title
-        new_post.content = content
-        new_post.category = category
-        new_post.save()
-
-        url = reverse('blog:detail', kwargs={'pk':new_post.pk})
-        return redirect(url)
 
     return render(request, 'edit.html', ctx)
 
@@ -160,4 +162,48 @@ def list_posts(request):
 
     # render 함수의 3번째 parameter는 Template Context를 dic으로 받는다.
     return render(request, 'list.html', ctx)
+"""
+
+"""
+def create_post(request):
+    form = PostNormalForm()
+    categories = Category.objects.all()
+
+    if request.method == 'POST':
+        # Form으로 Validataion 체크하는 방법
+        form = PostNormalForm(request.POST)
+        if form.is_valid() is True:
+            new_post = Post()
+            new_post.title = form.cleaned_data['title']
+            new_post.content = form.cleaned_data['content']
+            new_post.category = get_object_or_404(Category, pk=request.POST.get('category'))
+            new_post.save()
+            url = reverse('blog:detail', kwargs={'pk':new_post.pk})
+            return redirect(url)
+
+
+        # Form을 사용하지 않는 경우
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        category = get_object_or_404(Category, pk=request.POST.get('category'))
+
+        new_post = Post()
+        new_post.title = title
+        new_post.content = content
+        new_post.category = category
+        new_post.save()
+
+        url = reverse('blog:detail', kwargs={'pk':new_post.pk})
+        return redirect(url)
+
+    else:
+        post = get_object_or_404(Post, pk=2)
+        form = PostNormalForm(initial=post.__dict__)
+
+    ctx = {
+        'form' : form,
+        'categories' : categories,
+    }
+
+    return render(request, 'edit.html', ctx)
 """

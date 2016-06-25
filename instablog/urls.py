@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
 
 urlpatterns = [
+    url(r'^login/', login, name='login_url', kwargs={'template_name' : 'login.html'}), # template_name을 지정해주지 않으면 기본 화면은 'registration/login.html' 를 사용한다.
+    url(r'^logout/', logout, name='logout_url', kwargs={'next_page' : '/login'}),   # next_page는 로그아웃 한 이후에 이동할 화면이다.
     url(r'^admin/', admin.site.urls),
     url(r'^blog/', include('blog.urls', app_name='blog', namespace='blog')),
 ]
